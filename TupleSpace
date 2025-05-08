@@ -1,4 +1,4 @@
-““The tuple space is a shared data structure storing key-value pairs. Since the server is multi-threaded, it must be thread-safe.
+//““The tuple space is a shared data structure storing key-value pairs. Since the server is multi-threaded, it must be thread-safe.
 import threading””
 
 class TupleSpace:
