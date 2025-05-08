@@ -1,0 +1,6 @@
+To Implement the server.py and client.py file in the cmd command window.
+firt we need to open the cmd,then input:   cd PycharmProjects/PythonProject/.venv
+In server, we need to input : python server.py 51234
+In client,we need to put the client_1,clinet_2,.......client_10 txt file into the same file with client.py
+repeat 2rd step
+then we need to input python client.py localhost 51234 client_$i.txt (i=1,2,3.....,10)
