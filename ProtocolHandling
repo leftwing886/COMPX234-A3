@@ -1,0 +1,30 @@
+//""Define functions to encode and decode messages according to the protocol""
+
+def encode_request(command, key, value=None):
+    if command == "P":
+        message = f"{command} {key} {value}"
+    else:
+        message = f"{command} {key}"
+    return f"{len(message):03d} {message}"
+
+def encode_response(success, key, value=None, operation=None):
+    if success:
+        if operation == "PUT":
+            message = f"OK ({key}, {value}) added"
+        elif operation == "GET":
+            message = f"OK ({key}, {value}) removed"
+        else:  # READ
+            message = f"OK ({key}, {value}) read"
+    else:
+        if operation == "PUT":
+            message = f"ERR {key} already exists"
+        else:
+            message = f"ERR {key} does not exist"
+    return f"{len(message):03d} {message}"
+
+def decode_request(message):
+    parts = message[4:].split(" ", 2)  # Skip NNN and space
+    command = parts[0]
+    key = parts[1]
+    value = parts[2] if len(parts) > 2 else None
+    return command, key, value
