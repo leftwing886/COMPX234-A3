@@ -25,7 +25,7 @@ jobs:
         sleep 5  # Wait for server to start
     - name: Run client tests
       run: |
-        python client.py localhost 51234 client-1.txt
+        python client.py localhost 51234 client_1.txt
     - name: Upload test results
       if: always()
       uses: actions/upload-artifact@v3
