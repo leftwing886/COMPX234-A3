@@ -1,0 +1,70 @@
+““The tuple space is a shared data structure storing key-value pairs. Since the server is multi-threaded, it must be thread-safe.
+import threading””
+
+class TupleSpace:
+    def __init__(self):
+        self.tuples = {}  # Dictionary to store key-value pairs
+        self.lock = threading.Lock()  # Ensure thread-safe access
+        self.operation_counts = {"READ": 0, "GET": 0, "PUT": 0, "ERROR": 0}
+        self.total_clients = 0
+
+    def read(self, key):
+        with self.lock:
+            self.operation_counts["READ"] += 1
+            if key in self.tuples:
+                return (True, self.tuples[key])
+            self.operation_counts["ERROR"] += 1
+            return (False, None)
+
+    def get(self, key):
+        with self.lock:
+            self.operation_counts["GET"] += 1
+            if key in self.tuples:
+                value = self.tuples.pop(key)
+                return (True, value)
+            self.operation_counts["ERROR"] += 1
+            return (False, None)
+
+    def put(self, key, value):
+        with self.lock:
+            self.operation_counts["PUT"] += 1
+            if key in self.tuples:
+                self.operation_counts["ERROR"] += 1
+                return False
+            self.tuples[key] = value
+            return True
+
+    def stats(self):
+        with self.lock:
+            num_tuples = len(self.tuples)
+            if num_tuples == 0:
+                return {
+                    "num_tuples": 0,
+                    "avg_tuple_size": 0,
+                    "avg_key_size": 0,
+                    "avg_value_size": 0,
+                    "total_clients": self.total_clients,
+                    "total_ops": sum(self.operation_counts.values()),
+                    "reads": self.operation_counts["READ"],
+                    "gets": self.operation_counts["GET"],
+                    "puts": self.operation_counts["PUT"],
+                    "errors": self.operation_counts["ERROR"],
+                }
+            total_key_size = sum(len(k) for k in self.tuples.keys())
+            total_value_size = sum(len(v) for v in self.tuples.values())
+            return {
+                "num_tuples": num_tuples,
+                "avg_tuple_size": (total_key_size + total_value_size) / num_tuples,
+                "avg_key_size": total_key_size / num_tuples,
+                "avg_value_size": total_value_size / num_tuples,
+                "total_clients": self.total_clients,
+                "total_ops": sum(self.operation_counts.values()),
+                "reads": self.operation_counts["READ"],
+                "gets": self.operation_counts["GET"],
+                "puts": self.operation_counts["PUT"],
+                "errors": self.operation_counts["ERROR"],
+            }
+
+    def increment_client(self):
+        with self.lock:
+            self.total_clients += 1
